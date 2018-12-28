@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # */AIPND-revision/intropyproject-classify-pet-images/adjust_results4_isadog.py
 #                                                                             
-# PROGRAMMER: 
-# DATE CREATED:                                 
+# PROGRAMMER: Jhon Alexander Holguin B.
+# DATE CREATED: 27/12/2918                                
 # REVISED DATE: 
 # PURPOSE: Create a function adjust_results4_isadog that adjusts the results 
 #          dictionary to indicate whether or not the pet image label is of-a-dog, 
@@ -66,5 +66,45 @@ def adjust_results4_isadog(results_dic, dogfile):
                maltese) (string - indicates text file's filename)
     Returns:
            None - results_dic is mutable data type so no return needed.
-    """           
-    None
+    """
+    print("Adjusting results...")
+    NO_CONST = 0
+    YES_CONST = 1
+    dogs_dic = dict()
+    with open(dogfile, "r") as file:
+        for file_line in file:
+            file_line = file_line.strip()
+            # Some values are separated by "," in dogs file
+            line_values = file_line.split(",")
+            for value in line_values:
+                if value != "" and value not in dogs_dic:
+                    dogs_dic[value] = 1
+        file.close()
+    
+    for label_key in results_dic:
+        found_label = NO_CONST
+        found_classifier = NO_CONST
+        label = results_dic[label_key][0]
+        classifier_label = results_dic[label_key][1]
+        if label in dogs_dic:
+            found_label = YES_CONST
+            if classifier_string_has_a_dog(classifier_label, dogs_dic):
+                found_classifier = YES_CONST
+            
+        else:
+            if classifier_string_has_a_dog(classifier_label, dogs_dic):
+                found_classifier = YES_CONST
+        
+        results_dic[label_key].extend([found_label, found_classifier])
+
+def classifier_string_has_a_dog(classifier_string, dogs_dic):
+    """ 
+    Classifier string contains string separated by "," so evalue 
+    every value in the dogs dictionary to validate if it's a dog    
+    """
+    classifier_values = classifier_string.split(",")
+    for value in classifier_values:
+        if value.strip() in dogs_dic:
+            return True
+    return False
+            
